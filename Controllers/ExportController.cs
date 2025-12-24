@@ -1,16 +1,16 @@
 ﻿using DataUploader_DadarToTaloja.Interfaces;
-using DataUploader_DadarToTaloja.Services;
+using DataUploader_DadarToTaloja.Models;
 using Microsoft.AspNetCore.Mvc;
 
 public class ExportController : Controller
 {
-    private readonly IPIHoldExportService _piholdservice;
     private readonly IUserDetailsExportService _userdetailsservice;
+    private readonly ILogger<ExportController> _logger;
 
-    public ExportController(IPIHoldExportService piholdservice, IUserDetailsExportService userdetailsservice)
+    public ExportController(IUserDetailsExportService userdetailsservice, ILogger<ExportController> logger)
     {
-        _piholdservice = piholdservice;
         _userdetailsservice = userdetailsservice;
+        _logger = logger;
     }
 
     [HttpGet]
@@ -22,10 +22,25 @@ public class ExportController : Controller
     [HttpPost]
     public async Task<IActionResult> UpdateUploadDetails()
     {
-        int PIHoldcount = await _piholdservice.ExportAsync();
-        int UserDetailscount = await _userdetailsservice.ExportAsync();
-        ViewBag.PIHoldMessage = $"PI Hold exported: {PIHoldcount} records.";
-        ViewBag.UserDetailsMessage = $"User Details exported: {UserDetailscount} records.";
-        return View("PIHold");
+        try
+        {
+            int userDetailsCount = await _userdetailsservice.ExportAsync();
+
+            if (userDetailsCount > 0)
+            {
+                ViewBag.UserDetailsMessage = $"User Details exported successfully: {userDetailsCount} records.";
+            }
+            else
+            {
+                ViewBag.UserDetailsMessage = "No User Details records found to export.";
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred while exporting User Details.");
+            ViewBag.UserDetailsMessage = "An error occurred while exporting User Details. Please check logs for details.";
+        }
+
+        return View("UploadDetails");
     }
 }

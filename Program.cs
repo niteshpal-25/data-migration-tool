@@ -1,9 +1,10 @@
+using DataUploader_DadarToTaloja.Data;
+using DataUploader_DadarToTaloja.Interfaces;
+using DataUploader_DadarToTaloja.Models;
+using DataUploader_DadarToTaloja.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using DataUploader_DadarToTaloja.Interfaces;
-using DataUploader_DadarToTaloja.Services;
-using DataUploader_DadarToTaloja.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,7 +12,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 // Register your application services
-builder.Services.AddScoped<IPIHoldExportService, PIHoldExportService>();
+builder.Services.AddScoped<IUserDetailsExportService, UserDetailsExportService>();
+builder.Services.AddSingleton<UploadProgress>();
 
 // Register database connection factories
 builder.Services.AddSingleton<LocalDbConnectionFactory>();
