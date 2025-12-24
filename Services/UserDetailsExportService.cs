@@ -6,16 +6,16 @@ using DataUploader_DadarToTaloja.Models;
 
 namespace DataUploader_DadarToTaloja.Services
 {
-    public class PIHoldExportService : IPIHoldExportService
+    public class UserDetailsExportService: IUserDetailsExportService
     {
         private readonly LocalDbConnectionFactory _localDb;
         private readonly ServerDbConnectionFactory _serverDb;
-        private readonly ILogger<PIHoldExportService> _logger;
+        private readonly ILogger<UserDetailsExportService> _logger;
 
-        public PIHoldExportService(
+        public UserDetailsExportService(
             LocalDbConnectionFactory localDb,
             ServerDbConnectionFactory serverDb,
-            ILogger<PIHoldExportService> logger)
+            ILogger<UserDetailsExportService> logger)
         {
             _localDb = localDb;
             _serverDb = serverDb;
@@ -28,9 +28,9 @@ namespace DataUploader_DadarToTaloja.Services
 
             try
             {
-                _logger.LogInformation("Fetching PI Hold Details");
+                _logger.LogInformation("Fetching User Details");
 
-                var records = await GetPIHoldRecordsAsync();
+                var records = await GetUserDetailsRecordsAsync();
 
                 if (!records.Any())
                     return 0;
@@ -43,23 +43,23 @@ namespace DataUploader_DadarToTaloja.Services
                     await UpdateLocalAsync(item);
                 }
 
-                _logger.LogInformation("Completed PI Hold export");
+                _logger.LogInformation("Completed User Details");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error exporting PI Hold data");
+                _logger.LogError(ex, "Error exporting User Details data");
                 recordCount = 0;
             }
 
             return recordCount;
         }
 
-        private async Task<List<PIHoldDto>> GetPIHoldRecordsAsync()
+        private async Task<List<UserDetails>> GetUserDetailsRecordsAsync()
         {
-            var list = new List<PIHoldDto>();
+            var list = new List<UserDetails>();
 
             using var conn = _localDb.Create();
-            using var cmd = new SqlCommand("USP_Export_PI_Hold", conn)
+            using var cmd = new SqlCommand("SP_GetUSP_Export_UserDetails", conn)
             {
                 CommandType = CommandType.StoredProcedure
             };
@@ -69,16 +69,15 @@ namespace DataUploader_DadarToTaloja.Services
 
             while (await reader.ReadAsync())
             {
-                list.Add(new PIHoldDto
+                list.Add(new UserDetails
                 {
-                    PINO = reader["PINO"].ToString(),
-                    IsClear = Convert.ToBoolean(reader["IsClear"])
+                   
                 });
             }
             return list;
         }
 
-        private async Task UpdateServerAsync(PIHoldDto item)
+        private async Task UpdateServerAsync(UserDetails item)
         {
             using var conn = _serverDb.Create();
             using var cmd = new SqlCommand("USP_UpdateWOHold", conn)
@@ -86,22 +85,22 @@ namespace DataUploader_DadarToTaloja.Services
                 CommandType = CommandType.StoredProcedure
             };
 
-            cmd.Parameters.AddWithValue("@IsClear", item.IsClear);
-            cmd.Parameters.AddWithValue("@PINO", item.PINO);
+            //cmd.Parameters.AddWithValue("@IsClear", item.IsClear);
+            //cmd.Parameters.AddWithValue("@PINO", item.PINO);
 
             await conn.OpenAsync();
             await cmd.ExecuteNonQueryAsync();
         }
 
-        private async Task UpdateLocalAsync(PIHoldDto item)
+        private async Task UpdateLocalAsync(UserDetails item)
         {
             using var conn = _localDb.Create();
-            using var cmd = new SqlCommand("USP_UpdateWODetails", conn)
+            using var cmd = new SqlCommand("USP_UpdateUSerDetails", conn)
             {
                 CommandType = CommandType.StoredProcedure
             };
 
-            cmd.Parameters.AddWithValue("@PINO", item.PINO);
+            cmd.Parameters.AddWithValue("@UserID", item.UserID);
 
             await conn.OpenAsync();
             await cmd.ExecuteNonQueryAsync();

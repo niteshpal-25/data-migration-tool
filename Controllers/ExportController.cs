@@ -1,13 +1,16 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using DataUploader_DadarToTaloja.Interfaces;
+﻿using DataUploader_DadarToTaloja.Interfaces;
+using DataUploader_DadarToTaloja.Services;
+using Microsoft.AspNetCore.Mvc;
 
 public class ExportController : Controller
 {
-    private readonly IPIHoldExportService _service;
+    private readonly IPIHoldExportService _piholdservice;
+    private readonly IUserDetailsExportService _userdetailsservice;
 
-    public ExportController(IPIHoldExportService service)
+    public ExportController(IPIHoldExportService piholdservice, IUserDetailsExportService userdetailsservice)
     {
-        _service = service;
+        _piholdservice = piholdservice;
+        _userdetailsservice = userdetailsservice;
     }
 
     [HttpGet]
@@ -19,8 +22,10 @@ public class ExportController : Controller
     [HttpPost]
     public async Task<IActionResult> UpdateUploadDetails()
     {
-        int count = await _service.ExportAsync();
-        ViewBag.Message = $"{count} records exported successfully.";
+        int PIHoldcount = await _piholdservice.ExportAsync();
+        int UserDetailscount = await _userdetailsservice.ExportAsync();
+        ViewBag.PIHoldMessage = $"PI Hold exported: {PIHoldcount} records.";
+        ViewBag.UserDetailsMessage = $"User Details exported: {UserDetailscount} records.";
         return View("PIHold");
     }
 }
