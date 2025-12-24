@@ -119,6 +119,7 @@ namespace DataUploader_DadarToTaloja.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error inserting Department Details into server for EmpID: {EmpID}", item.DeptID);
+
                 throw;
             }
         }
