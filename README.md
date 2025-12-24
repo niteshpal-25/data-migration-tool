@@ -1,0 +1,20 @@
+**First Table User Details**
+
+CREATE TABLE [dbo].[UserDetails](
+	[UserID] [int] IDENTITY(1,1) NOT NULL,
+	[EmpID] [nchar](10) NULL,
+	[UserName] [nvarchar](150) NOT NULL,
+	[Pswrd] [nvarchar](50) NOT NULL,
+	[UserType] [nvarchar](50) NOT NULL,
+	[Dept] [nvarchar](50) NOT NULL,
+	[email_ID] [nvarchar](200) NOT NULL,
+	[Gender] [nvarchar](50) NULL,
+	[DOB] [datetime] NULL,
+	[IsActive] [bit] NOT NULL,
+	[IsAdded] [bit] NULL,
+ CONSTRAINT [PK_UserDetails] PRIMARY KEY CLUSTERED 
+(
+	[UserID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
