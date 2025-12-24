@@ -5,11 +5,13 @@ using Microsoft.AspNetCore.Mvc;
 public class ExportController : Controller
 {
     private readonly IUserDetailsExportService _userdetailsservice;
+    private readonly IDepartmentDetailsExportService _departmentservice;
     private readonly ILogger<ExportController> _logger;
 
-    public ExportController(IUserDetailsExportService userdetailsservice, ILogger<ExportController> logger)
+    public ExportController(IUserDetailsExportService userdetailsservice, ILogger<ExportController> logger, IDepartmentDetailsExportService departmentservice)
     {
         _userdetailsservice = userdetailsservice;
+        _departmentservice = departmentservice;
         _logger = logger;
     }
 
