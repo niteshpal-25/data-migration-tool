@@ -12,6 +12,7 @@ namespace DataUploader_DadarToTaloja.Services
         private readonly ServerDbConnectionFactory _serverDb;
         private readonly ILogger<ProjectExportService> _logger;
 
+
         public ProjectExportService(
             LocalDbConnectionFactory localDb,
             ServerDbConnectionFactory serverDb,
