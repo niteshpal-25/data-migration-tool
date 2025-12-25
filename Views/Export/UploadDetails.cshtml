@@ -69,7 +69,7 @@
         );
     }
 
-    function exportTask(url, progressId, messageId, sectionId, onComplete) {
+        function exportTask(url, progressId, messageId, sectionId, onComplete) {
 
         // Hide all sections
         $(".export-section").addClass("d-none");
@@ -87,28 +87,32 @@
 
         msg.html("");
 
-        $.ajax({
-            url: url,
-            type: "POST",
-            success: function (res) {
-                if (res.success) {
-                    bar.css("width", "100%")
-                       .text("100%")
-                       .addClass("bg-success");
+        // Add 10-second delay before AJAX
+        setTimeout(function () {
+            $.ajax({
+                url: url,
+                type: "POST",
+                success: function (res) {
+                    if (res.success) {
+                        bar.css("width", "100%")
+                           .text("100%")
+                           .addClass("bg-success");
 
-                    msg.html(`<div class="alert alert-success">${res.message}</div>`);
+                        msg.html(`<div class="alert alert-success">${res.message}</div>`);
 
-                    // Move to next step
-                    if (onComplete) onComplete();
-                } else {
+                        // Move to next step
+                        if (onComplete) onComplete();
+                    } else {
+                        bar.addClass("bg-danger");
+                        msg.html(`<div class="alert alert-danger">${res.message}</div>`);
+                    }
+                },
+                error: function () {
                     bar.addClass("bg-danger");
-                    msg.html(`<div class="alert alert-danger">${res.message}</div>`);
+                    msg.html(`<div class="alert alert-danger">Unexpected error occurred</div>`);
                 }
-            },
-            error: function () {
-                bar.addClass("bg-danger");
-                msg.html(`<div class="alert alert-danger">Unexpected error occurred</div>`);
-            }
-        });
+            });
+        }, 10000); // 10000ms = 10 seconds
     }
+
 </script>
