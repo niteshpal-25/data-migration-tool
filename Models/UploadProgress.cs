@@ -6,5 +6,6 @@
         public int Completed { get; set; }
         public bool IsCompleted { get; set; }
         public DateTime StartTime { get; set; }
+
     }
 }
