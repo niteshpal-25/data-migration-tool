@@ -33,3 +33,13 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
+
+**Project Details**
+
+CREATE TABLE project (
+    project_id INT PRIMARY KEY identity(1,1),
+    project_name VARCHAR(50),
+    dept_id INT,
+	isactive bit,
+	IsAdded	bit
+);
