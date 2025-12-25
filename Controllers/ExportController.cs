@@ -1,6 +1,8 @@
 ﻿using DataUploader_DadarToTaloja.Interfaces;
-using DataUploader_DadarToTaloja.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Threading.Tasks;
 
 public class ExportController : Controller
 {
@@ -9,7 +11,11 @@ public class ExportController : Controller
     private readonly IProjectDetailsExportService _projectservice;
     private readonly ILogger<ExportController> _logger;
 
-    public ExportController(IUserDetailsExportService userdetailsservice, ILogger<ExportController> logger, IDepartmentDetailsExportService departmentservice, IProjectDetailsExportService projectservice)
+    public ExportController(
+        IUserDetailsExportService userdetailsservice,
+        IDepartmentDetailsExportService departmentservice,
+        IProjectDetailsExportService projectservice,
+        ILogger<ExportController> logger)
     {
         _userdetailsservice = userdetailsservice;
         _departmentservice = departmentservice;
@@ -17,36 +23,88 @@ public class ExportController : Controller
         _logger = logger;
     }
 
+    // View Load
     [HttpGet]
     public IActionResult UploadDetails()
     {
         return View();
     }
 
+    // ================= USER EXPORT =================
     [HttpPost]
-    public async Task<IActionResult> UpdateUploadDetails()
+    public async Task<IActionResult> ExportUsers()
     {
         try
         {
-            int userDetailsCount = await _userdetailsservice.ExportAsync();
-            int DepartmentDetailsCount = await _departmentservice.ExportAsync();
-            int ProjectDetailsCount = await _projectservice.ExportAsync();
+            int count = await _userdetailsservice.ExportAsync();
 
-            if (userDetailsCount > 0 || DepartmentDetailsCount > 0 || ProjectDetailsCount > 0)
+            return Json(new
             {
-                ViewBag.UserDetailsMessage = $"Details exported successfully.";
-            }
-            else
-            {
-                ViewBag.UserDetailsMessage = "No records found to export.";
-            }
+                success = true,
+                message = $"User export completed. Records: {count}"
+            });
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error occurred while exporting Details.");
-            ViewBag.UserDetailsMessage = "An error occurred while exporting Details. Please check logs for details.";
-        }
+            _logger.LogError(ex, "User export failed");
 
-        return View("UploadDetails");
+            return Json(new
+            {
+                success = false,
+                message = "User export failed"
+            });
+        }
+    }
+
+    // ================= DEPARTMENT EXPORT =================
+    [HttpPost]
+    public async Task<IActionResult> ExportDepartments()
+    {
+        try
+        {
+            int count = await _departmentservice.ExportAsync();
+
+            return Json(new
+            {
+                success = true,
+                message = $"Department export completed. Records: {count}"
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Department export failed");
+
+            return Json(new
+            {
+                success = false,
+                message = "Department export failed"
+            });
+        }
+    }
+
+    // ================= PROJECT EXPORT =================
+    [HttpPost]
+    public async Task<IActionResult> ExportProjects()
+    {
+        try
+        {
+            int count = await _projectservice.ExportAsync();
+
+            return Json(new
+            {
+                success = true,
+                message = $"Project export completed. Records: {count}"
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Project export failed");
+
+            return Json(new
+            {
+                success = false,
+                message = "Project export failed"
+            });
+        }
     }
 }
