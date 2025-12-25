@@ -14,6 +14,7 @@ builder.Services.AddControllersWithViews();
 // Register your application services
 builder.Services.AddScoped<IUserDetailsExportService, UserDetailsExportService>();
 builder.Services.AddScoped<IDepartmentDetailsExportService, DepartmentExportService>();
+builder.Services.AddScoped<IProjectDetailsExportService, ProjectExportService>();
 builder.Services.AddSingleton<UploadProgress>();
 
 // Register database connection factories

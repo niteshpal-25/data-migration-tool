@@ -6,16 +6,16 @@ using DataUploader_DadarToTaloja.Models;
 
 namespace DataUploader_DadarToTaloja.Services
 {
-    public class DepartmentExportService : IDepartmentDetailsExportService
+    public class ProjectExportService : IProjectDetailsExportService
     {
         private readonly LocalDbConnectionFactory _localDb;
         private readonly ServerDbConnectionFactory _serverDb;
-        private readonly ILogger<DepartmentExportService> _logger;
+        private readonly ILogger<ProjectExportService> _logger;
 
-        public DepartmentExportService(
+        public ProjectExportService(
             LocalDbConnectionFactory localDb,
             ServerDbConnectionFactory serverDb,
-            ILogger<DepartmentExportService> logger)
+            ILogger<ProjectExportService> logger)
         {
             _localDb = localDb;
             _serverDb = serverDb;
@@ -27,13 +27,13 @@ namespace DataUploader_DadarToTaloja.Services
 
             try
             {
-                _logger.LogInformation("Fetching Department Details");
+                _logger.LogInformation("Fetching project Details");
 
-                var records = await GetUserDetailsRecordsAsync();
+                var records = await GetProjectRecordsAsync();
 
                 if (!records.Any())
                 {
-                    _logger.LogInformation("No Department Details records found to export.");
+                    _logger.LogInformation("No project Details records found to export.");
                     return 0;
                 }
 
@@ -48,29 +48,29 @@ namespace DataUploader_DadarToTaloja.Services
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError(ex, "Error exporting Department Details for EmpID: {EmpID}", item.DeptID);
+                        _logger.LogError(ex, "Error exporting project Details for project_id: {project_id}", item.project_id);
                     }
                 }
 
-                _logger.LogInformation("Completed exporting Department Details. Total records processed: {Count}", recordCount);
+                _logger.LogInformation("Completed exporting project Details. Total records processed: {Count}", recordCount);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error exporting Department Details data");
+                _logger.LogError(ex, "Error exporting project Details data");
                 recordCount = 0;
             }
 
             return recordCount;
         }
 
-        private async Task<List<Departments>> GetUserDetailsRecordsAsync()
+        private async Task<List<Project>> GetProjectRecordsAsync()
         {
-            var list = new List<Departments>();
+            var list = new List<Project>();
 
             try
             {
                 using var conn = _localDb.Create();
-                using var cmd = new SqlCommand("SP_GetUSP_Export_Department", conn)
+                using var cmd = new SqlCommand("SP_GetUSP_Export_project", conn)
                 {
                     CommandType = CommandType.StoredProcedure
                 };
@@ -80,36 +80,36 @@ namespace DataUploader_DadarToTaloja.Services
 
                 while (await reader.ReadAsync())
                 {
-                    list.Add(new Departments
+                    list.Add(new Project
                     {
-                        DeptID = Convert.ToInt32(reader["DeptID"]),
-                        DeptName = reader["DeptName"].ToString(),
-                        Location = reader["Location"].ToString(),
-                        CreatedDate = reader["CreatedDate"] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(reader["CreatedDate"])                       
+                        project_id = Convert.ToInt32(reader["project_id"]),
+                        project_name = reader["project_name"].ToString(),
+                        dept_id = reader["dept_id"].ToString(),
+                        isactive = Convert.ToBoolean(reader["isactive"])
                     });
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error fetching Department Details from local database.");
+                _logger.LogError(ex, "Error fetching project Details from local database.");
             }
 
             return list;
         }
 
-        private async Task UpdateServerAsync(Departments item)
+        private async Task UpdateServerAsync(Project item)
         {
             try
             {
                 using var conn = _serverDb.Create();
-                using var cmd = new SqlCommand("SP_Insert_Export_Departments", conn)
+                using var cmd = new SqlCommand("SP_Insert_Export_project", conn)
                 {
                     CommandType = CommandType.StoredProcedure
                 };
                 
-                cmd.Parameters.AddWithValue("@DeptName", item.DeptName);
-                cmd.Parameters.AddWithValue("@Location", item.Location);
-                cmd.Parameters.AddWithValue("@CreatedDate", item.CreatedDate);
+                cmd.Parameters.AddWithValue("@project_name", item.project_name);
+                cmd.Parameters.AddWithValue("@dept_id", item.dept_id);
+                cmd.Parameters.AddWithValue("@isactive", item.isactive);
                 cmd.Parameters.AddWithValue("@IsAdded", 1);
 
                 await conn.OpenAsync();
@@ -117,30 +117,30 @@ namespace DataUploader_DadarToTaloja.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error inserting Department Details into server for DeptID: {DeptID}", item.DeptID);
+                _logger.LogError(ex, "Error inserting Department Details into server for project_id: {project_id}", item.project_id);
 
                 throw;
             }
         }
 
-        private async Task UpdateLocalAsync(Departments item)
+        private async Task UpdateLocalAsync(Project item)
         {
             try
             {
                 using var conn = _localDb.Create();
-                using var cmd = new SqlCommand("USP_UpdateDepartments", conn)
+                using var cmd = new SqlCommand("USP_UpdateProject", conn)
                 {
                     CommandType = CommandType.StoredProcedure
                 };
 
-                cmd.Parameters.AddWithValue("@DeptID", item.DeptID);
+                cmd.Parameters.AddWithValue("@project_id", item.project_id);
 
                 await conn.OpenAsync();
                 await cmd.ExecuteNonQueryAsync();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error updating local Department Details for DeptID: {DeptID}", item.DeptID);
+                _logger.LogError(ex, "Error updating local Department Details for DeptID: {DeptID}", item.project_id);
                 throw;
             }
         }
