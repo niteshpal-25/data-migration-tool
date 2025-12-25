@@ -1,0 +1,49 @@
+Create proc SP_Insert_Export_project  
+@project_name nvarchar(500),  
+@dept_id int,  
+@isactive int,  
+@IsAdded bit  
+As  
+begin  
+  insert into project(project_name,dept_id,isactive,IsAdded) values (@project_name,@dept_id,@isactive,@IsAdded)  
+end
+
+CREATE PROCEDURE SP_Insert_Export_Departments       
+(            
+ @DeptName nvarchar(200),    
+ @Location nvarchar(200),    
+ @CreatedDate datetime,    
+ @IsAdded int      
+)        
+AS        
+BEGIN        
+    SET NOCOUNT ON;          
+    INSERT INTO Departments(DeptName,Location,CreatedDate,IsAdded)      
+    VALUES(@DeptName,@Location,@CreatedDate,@IsAdded);        
+END; 
+
+CREATE PROCEDURE SP_Insert_Export_UserDetails    
+(    
+    @EmpID      nvarchar(max),    
+    @UserName   NVARCHAR(100),    
+    @Pswrd      NVARCHAR(100),    
+    @UserType   NVARCHAR(50),    
+    @Dept       NVARCHAR(100),    
+    @email_ID   NVARCHAR(150),    
+    @Gender     NVARCHAR(10),    
+    @DOB        DATE = NULL,    
+    @IsActive   BIT = NULL ,  
+ @IsAdded int  
+)    
+AS    
+BEGIN    
+    SET NOCOUNT ON;      
+    INSERT INTO UserDetails    
+    (    
+        EmpID,  UserName,  Pswrd,  UserType,  Dept,  email_ID,  Gender,  DOB,  IsActive  ,IsAdded  
+    )  
+    VALUES    
+    (    
+        @EmpID,  @UserName,  @Pswrd,  @UserType,  @Dept,  @email_ID,  @Gender,  @DOB,  @IsActive,1  
+    );    
+END;
