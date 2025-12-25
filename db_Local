@@ -1,0 +1,38 @@
+Create proc USP_UpdateProject  
+@project_id int  
+AS  
+begin  
+  update Project set IsAdded=1 where project_id=@project_id  
+end
+
+Create proc SP_GetUSP_Export_project  
+AS  
+begin  
+  Select * from project where isnull(IsAdded,0)=0  
+end
+
+Create Proc USP_UpdateDepartments  
+@DeptID int    
+AS    
+begin    
+  Update Departments set IsAdded=1 where DeptID=@DeptID    
+end
+
+CREATE Proc SP_GetUSP_Export_Department  
+AS      
+begin      
+  Select * from Departments where isnull(IsAdded,0)=0    
+end 
+
+Create Proc USP_UpdateUSerDetails  
+@UserID int  
+AS  
+begin  
+  Update userDetails set IsAdded=1 where UserID=@UserID  
+end
+
+CREATE Proc SP_GetUSP_Export_UserDetails    
+AS    
+begin    
+  Select * from UserDetails where IsActive=1  and isnull(IsAdded,0)=0  
+end
